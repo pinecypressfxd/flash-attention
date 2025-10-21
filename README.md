@@ -1,3 +1,19 @@
+# FlashAttention快速安装
+## 2025-10-21
+依据教程https://zhuanlan.zhihu.com/p/655077866，flash attention在安装的时候主要时间是下载2个依赖库和编译。为了高效安装flash-attention，本库已经通过浏览器下载好其他依赖库，并修改编译脚本，直接从本地开始编译，读者可直接下载本库，然后执行如下命令进行安装：
+```sh
+git clone -b quickinstall https://github.com/pinecypressfxd/flash-attention.git
+cd flash-attention
+python setup.py install
+```
+
+当前版本是2025-10-21最新的，若后续需要更新，读者可下载本库之后，按照如下命令更新这2个依赖库。
+```sh
+cd flash-attention/csrc
+git clone https://github.com/ROCm/composable_kernel.git
+git clone https://github.com/NVIDIA/cutlass.git
+```
+
 # FlashAttention
 This repository provides the official implementation of FlashAttention and
 FlashAttention-2 from the
