@@ -210,20 +210,20 @@ ext_modules = []
 
 # We want this even if SKIP_CUDA_BUILD because when we run python setup.py sdist we want the .hpp
 # files included in the source distribution, in case the user compiles from source.
-if os.path.isdir(".git"):
+# Use local sources only. Do NOT run any git submodule commands.
+# Fail fast if required sources are missing.
+if IS_ROCM:
     if not SKIP_CK_BUILD:
-        subprocess.run(["git", "submodule", "update", "--init", "csrc/composable_kernel"], check=True)
-        subprocess.run(["git", "submodule", "update", "--init", "csrc/cutlass"], check=True)
+        if not os.path.exists("csrc/composable_kernel/example/ck_tile/01_fmha/generate.py"):
+            raise FileNotFoundError(
+                "Missing ROCm composable_kernel sources at csrc/composable_kernel. "
+                "Please place the repo there or set FLASH_ATTENTION_SKIP_CK_BUILD=TRUE or FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE."
+            )
 else:
-    if IS_ROCM:
-        if not SKIP_CK_BUILD:
-            assert (
-                os.path.exists("csrc/composable_kernel/example/ck_tile/01_fmha/generate.py")
-            ), "csrc/composable_kernel is missing, please use source distribution or git clone"
-    else:
-        assert (
-            os.path.exists("csrc/cutlass/include/cutlass/cutlass.h")
-        ), "csrc/cutlass is missing, please use source distribution or git clone"
+    if not os.path.exists("csrc/cutlass/include/cutlass/cutlass.h"):
+        raise FileNotFoundError(
+            "Missing CUTLASS headers at csrc/cutlass. Please place the repo there."
+        )
 
 if not SKIP_CUDA_BUILD and not IS_ROCM:
     print("\n\ntorch.__version__  = {}\n\n".format(torch.__version__))
